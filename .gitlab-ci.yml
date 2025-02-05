@@ -13,6 +13,9 @@ build-job:       # This job runs in the build stage, which runs first.
     - npm install
     - npm run build
     - echo "This job runs on runners with the 'violet' tag"
+  artifacts:
+    paths:
+      - dist/
   cache:
     paths:
       - node_modules/
