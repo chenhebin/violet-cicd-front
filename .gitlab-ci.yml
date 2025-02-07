@@ -2,8 +2,8 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - deploy
 variables:
-  VIOLET_DOCKER_EMAIL: $VIOLET_DOCKER_EMAIL  # 使用在 GitLab 中设置的加密变量
-  VIOLET_DOCKER_PASSWORD: $VIOLET_DOCKER_PASSWORD  # 使用在 GitLab 中设置的加密变量
+  VIOLET_DOCKER_EMAIL: $VIOLET_DOCKER_EMAIL
+  VIOLET_DOCKER_PASSWORD: $VIOLET_DOCKER_PASSWORD
 
 before_script:
   - export PROJECT_NAME=$(cat package.json | grep name | head -1 | awk -F "[\"]" '/name/{print$4}')
@@ -23,9 +23,9 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Login to Docker Hub"
     - echo $PROJECT_NAME
     - echo $BUILD_TAG
-    - echo $VIOLET_DOCKER_EMAIL
-    - echo $VIOLET_DOCKER_PASSWORD
-    - apk add --no-cache docker
+    - echo "VIOLET_DOCKER_EMAIL: $VIOLET_DOCKER_EMAIL"
+    - echo "VIOLET_DOCKER_PASSWORD: $VIOLET_DOCKER_PASSWORD"
+    - apt-get update && apt-get install -y docker.io
     - docker login -u $VIOLET_DOCKER_EMAIL -p $VIOLET_DOCKER_PASSWORD
     - docker build -t $VIOLET_REGISTRY/$VIOLET_IMAGE_NAME:$BUILD_TAG .
     - docker push $VIOLET_REGISTRY/$VIOLET_IMAGE_NAME:$BUILD_TAG
