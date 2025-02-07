@@ -13,6 +13,10 @@ build-job:       # This job runs in the build stage, which runs first.
   image: node:20
   only:
     - tags
+  services:
+    - docker:20.10.0-dind   # 使用 Docker-in-Docker 服务
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
   script:
     - echo "Compiling the code..."
     - echo "Compile complete."
@@ -26,6 +30,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo $VIOLET_DOCKER_EMAIL
     - echo $VIOLET_DOCKER_PASSWORD
     - apt-get update && apt-get install -y docker.io
+    - docker info  # 确认 Docker 是否可用
     - docker login -u $VIOLET_DOCKER_EMAIL -p $VIOLET_DOCKER_PASSWORD
     - docker build -t $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG .
     - docker push $VIOLET_REGISTRY/$VIOLET_IMAGE_NAME:$BUILD_TAG
