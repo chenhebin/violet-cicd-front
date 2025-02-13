@@ -8,7 +8,7 @@ variables:
 
 before_script:
   - export PROJECT_NAME=$(cat package.json | grep name | head -1 | awk -F "[\"]" '/name/{print$4}')
-  - export BUILD_TAG=$CI_COMMIT_TAG-$PROJECT_NAME
+  - export BUILD_TAG=${CI_COMMIT_TAG:-latest}-$PROJECT_NAME  # 设置默认值为 latest
 
 build-job:
   stage: build
@@ -22,6 +22,10 @@ build-job:
     - echo "Compiling the code..."
     - npm install
     - npm run build
+    - echo $PROJECT_NAME
+    - echo $BUILD_TAG
+    - echo $VIOLET_DOCKER_EMAIL
+    - echo $VIOLET_DOCKER_PASSWORD
     - docker info  # 确认 Docker 是否可用
     - echo "Login to Docker Hub"
     - echo $VIOLET_DOCKER_PASSWORD | docker login -u $VIOLET_DOCKER_EMAIL --password-stdin
