@@ -5,6 +5,7 @@ stages:          # List of stages for jobs, and their order of execution
 variables:
   VIOLET_DOCKER_EMAIL: $VIOLET_DOCKER_EMAIL
   VIOLET_DOCKER_PASSWORD: $VIOLET_DOCKER_PASSWORD
+  DOCKER_DRIVER: overlay2  # 使用 overlay2 存储驱动
 
 before_script:
   - export PROJECT_NAME=$(cat package.json | grep name | head -1 | awk -F "[\"]" '/name/{print$4}')
@@ -13,11 +14,12 @@ before_script:
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   image: node:20
+  services:
+    - docker:20-dind  # 启动 Docker-in-Docker 服务
   only:
     - tags
   script:
     - echo "Compiling the code..."
-    - echo "Compile complete."
     - npm install
     - npm run build
     - echo "This job runs on runners with the 'violet' tag"
