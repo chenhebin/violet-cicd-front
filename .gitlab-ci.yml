@@ -12,31 +12,27 @@ before_script:
 
 build-job:
   stage: build
-  image: node:20  # 第一阶段，使用 Node.js 镜像
+  image: node:20
   only:
     - tags
+  before_script:
+    - apt-get update && apt-get install -y docker.io  # 安装 Docker
+    - service docker start  # 启动 Docker 服务
   script:
     - echo "Compiling the code..."
     - npm install
     - npm run build
-    - echo "This job runs on runners with the 'violet' tag"
+    - docker info  # 确认 Docker 是否可用
+    - echo "Login to Docker Hub"
+    - echo $VIOLET_DOCKER_PASSWORD | docker login -u $VIOLET_DOCKER_EMAIL --password-stdin
+    - docker build -t $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG .  # 使用构建好的文件生成 Docker 镜像
+    - docker push $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG
   artifacts:
     paths:
-      - dist/
+      - dist/  # 保存构建产物，以便后续部署
   cache:
     paths:
       - node_modules/
-
-docker-build-job:
-  stage: build
-  image: docker:20.10.7  # 第二阶段，使用 Docker 镜像
-  only:
-    - tags
-  script:
-    - echo "Login to Docker Hub"
-    - echo $VIOLET_DOCKER_PASSWORD | docker login -u $VIOLET_DOCKER_EMAIL --password-stdin
-    - docker build -t $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG .
-    - docker push $VIOLET_REGISTRY/$VIOLET_IMAGE_NAME:$BUILD_TAG
 
 deploy-job:
   stage: deploy
