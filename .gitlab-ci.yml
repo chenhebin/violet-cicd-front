@@ -28,6 +28,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo $VIOLET_DOCKER_EMAIL
     - echo $VIOLET_DOCKER_PASSWORD
     - apt-get update && apt-get install -y docker.io
+    - service docker start  # 启动 Docker 服务
     - docker info  # 确认 Docker 是否可用
     - echo $VIOLET_DOCKER_PASSWORD | docker login -u $VIOLET_DOCKER_EMAIL --password-stdin  # 使用 --password-stdin 安全登录
     - docker build -t $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG .
