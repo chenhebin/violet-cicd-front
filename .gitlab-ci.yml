@@ -9,6 +9,8 @@ variables:
 before_script:
   - export PROJECT_NAME=$(cat package.json | grep name | head -1 | awk -F "[\"]" '/name/{print$4}')
   - export BUILD_TAG=${CI_COMMIT_TAG:-latest}-$PROJECT_NAME  # 设置默认值为 latest
+  - echo "Global before_script - PROJECT_NAME: $PROJECT_NAME"
+  - echo "Global before_script - BUILD_TAG: $BUILD_TAG"
 
 build-job:
   stage: build
@@ -18,6 +20,8 @@ build-job:
   before_script:
     - apt-get update && apt-get install -y docker.io  # 安装 Docker
     - service docker start  # 启动 Docker 服务
+    - echo "Job-specific before_script - PROJECT_NAME: $PROJECT_NAME"
+    - echo "Job-specific before_script - BUILD_TAG: $BUILD_TAG"
   script:
     - echo "Compiling the code..."
     - npm install
