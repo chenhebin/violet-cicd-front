@@ -3,6 +3,9 @@ stages:
   - deploy
 
 variables:
+  VIOLET_SERVER_IP: $VIOLET_SERVER_IP
+  VIOLET_SERVER_USER: $VIOLET_SERVER_USER
+  VIOLET_DEPLOY_SSH_KEY: $VIOLET_DEPLOY_SSH_KEY
   VIOLET_DOCKER_EMAIL: $VIOLET_DOCKER_EMAIL
   VIOLET_DOCKER_PASSWORD: $VIOLET_DOCKER_PASSWORD
 
@@ -38,9 +41,21 @@ build-job:
 
 deploy-job:
   stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk update && apk add --no-cache openssh
+  script:
+    - echo "Deploying application to server..."
+    - echo $VIOLET_SERVER_IP
+    - echo $VIOLET_SERVER_USER
+    - echo $VIOLET_DEPLOY_SSH_KEY
+    - apk add --no-cache openssh
+    - echo $VIOLET_DEPLOY_SSH_KEY > /tmp/ssh_key
+    - chmod 600 /tmp/ssh_key
+    - ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
+      docker pull $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME && \
+      docker stop app_container && \
+      docker rm app_container && \
+      docker run -d --name app_container -p 80:80 $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME"
   only:
     - tags
-  environment: production
-  script:
-    - echo "Deploying application..."
-    - echo "Application successfully deployed."
