@@ -3,6 +3,8 @@ stages:
   - deploy
 
 variables:
+  VIOLET_PROJECT_NAME: "$(cat package.json | grep name | head -1 | awk -F "[\"]" '/name/{print$4}')"
+  VIOLET_BUILD_TAG: "${CI_COMMIT_TAG:-latest}-${PROJECT_NAME}"
   TMP_IMAGE: "chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front"
   VIOLET_DEPLOY_PORT: $VIOLET_DEPLOY_PORT
   VIOLET_DEPLOY_ONLY: $VIOLET_DEPLOY_ONLY
@@ -30,6 +32,8 @@ build-job:
     - echo "Compiling the code..."
     - npm install
     - npm run build
+    - echo $VIOLET_PROJECT_NAME
+    - echo $VIOLET_BUILD_TAG
     - echo $PROJECT_NAME
     - echo $BUILD_TAG
     - echo $VIOLET_DOCKER_EMAIL
