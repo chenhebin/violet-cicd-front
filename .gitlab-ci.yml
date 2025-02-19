@@ -48,14 +48,18 @@ deploy-job:
   stage: deploy
   image: alpine:latest
   before_script:
-    - apk update && apk add --no-cache openssh sshpass  # 添加sshpass
+    - apk update && apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$VIOLET_PRIVATE_ID_RSA" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H "$VIOLET_SERVER_IP" >> ~/.ssh/known_hosts
   script:
     - echo "Deploying application to server..."
     - echo $VIOLET_SERVER_IP
     - echo $VIOLET_SERVER_USER
     - echo $VIOLET_DEPLOY_SSH_KEY
     - apk add --no-cache openssh
-    - sshpass -p "$VIOLET_SERVER_PASSWORD" ssh -v -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
+    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
       docker pull $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME && \
       docker stop app_container || true && \
       docker rm app_container || true && \
