@@ -7,7 +7,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY ./dist /usr/share/nginx/html
 
 # 自定义模板（若需要动态配置）
-COPY nginx.template /etc/nginx/templates/
+#COPY nginx.template /etc/nginx/templates/
 
 # 使用 Node.js 官方镜像作为基础镜像
 #FROM node:20
