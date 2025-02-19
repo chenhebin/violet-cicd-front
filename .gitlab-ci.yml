@@ -63,7 +63,7 @@ deploy-job:
     - echo $TMP_IMAGE
     - echo $VIOLET_DEPLOY_PORT
     - apk add --no-cache openssh
-    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP '
-      docker pull $TMP_IMAGE && docker stop hello_world_cicd_container_test || true && docker rm hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $TMP_IMAGE'
+    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
+      docker pull $TMP_IMAGE && docker stop hello_world_cicd_container_test || true && docker rm hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $TMP_IMAGE"
   only:
     - tags
