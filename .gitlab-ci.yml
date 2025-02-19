@@ -3,6 +3,7 @@ stages:
   - deploy
 
 variables:
+  VIOLET_DEPLOY_ONLY: $VIOLET_DEPLOY_ONLY
   VIOLET_SERVER_IP: $VIOLET_SERVER_IP
   VIOLET_SERVER_USER: $VIOLET_SERVER_USER
   VIOLET_DEPLOY_SSH_KEY: $VIOLET_DEPLOY_SSH_KEY
@@ -12,6 +13,9 @@ variables:
 build-job:
   stage: build
   image: node:20
+  except:
+    variables:
+      - $VIOLET_DEPLOY_ONLY == "true"  # 当设置了这个变量时跳过构建
   only:
     - tags
   before_script:
@@ -50,13 +54,12 @@ deploy-job:
     - echo $VIOLET_SERVER_USER
     - echo $VIOLET_DEPLOY_SSH_KEY
     - apk add --no-cache openssh
-    - echo $VIOLET_DEPLOY_SSH_KEY > /tmp/ssh_key
+    - echo "$VIOLET_DEPLOY_SSH_KEY" > /tmp/ssh_key
     - chmod 600 /tmp/ssh_key
-    - ssh-keygen -lf /tmp/ssh_key
-    - ssh -v -o StrictHostKeyChecking=no -i /tmp/ssh_key $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
+    - ssh -vvv -o StrictHostKeyChecking=no -i /tmp/ssh_key $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
       docker pull $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME && \
-      docker stop app_container && \
-      docker rm app_container && \
+      docker stop app_container || true && \
+      docker rm app_container || true && \
       docker run -d --name app_container -p 80:80 $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME"
   only:
     - tags
