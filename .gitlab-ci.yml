@@ -3,6 +3,7 @@ stages:
   - deploy
 
 variables:
+  VIOLET_DEPLOY_PORT: $VIOLET_DEPLOY_PORT
   VIOLET_DEPLOY_ONLY: $VIOLET_DEPLOY_ONLY
   VIOLET_SERVER_IP: $VIOLET_SERVER_IP
   VIOLET_SERVER_USER: $VIOLET_SERVER_USER
@@ -48,6 +49,7 @@ deploy-job:
   stage: deploy
   image: alpine:latest
   before_script:
+    - export IMAGE_NAME=chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front
     - apk update && apk add --no-cache openssh-client
     - mkdir -p ~/.ssh
     - echo "$VIOLET_PRIVATE_ID_RSA" > ~/.ssh/id_rsa
@@ -60,6 +62,6 @@ deploy-job:
     - echo $VIOLET_DEPLOY_SSH_KEY
     - apk add --no-cache openssh
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP '
-      docker pull chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front && docker stop app_container_test || true && docker rm app_container_test || true && docker run -d --name app_container_test -p 801:801 chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front'
+      docker pull $IMAGE_NAME && docker stop hello_world_cicd_container_test || true && docker rm hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $IMAGE_NAME'
   only:
     - tags
