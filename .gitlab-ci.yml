@@ -60,9 +60,9 @@ deploy-job:
     - echo $VIOLET_DEPLOY_SSH_KEY
     - apk add --no-cache openssh
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
-      sudo docker pull chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front && \
-      sudo docker stop app_container || true && \
-      sudo docker rm app_container || true && \
-      sudo docker run -d --name app_container -p 80:80 chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front"
+      docker pull chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front && \
+      docker stop app_container_test || true && \
+      docker rm app_container_test || true && \
+      docker run -d --name app_container_test -p 801:801 chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front"
   only:
     - tags
