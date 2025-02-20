@@ -3,7 +3,7 @@ stages:
   - deploy
 
 variables:
-  TMP_IMAGE: "chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front"
+#  TMP_IMAGE: "chenhebin/violet-cicd-test-resp:violet-1.0.0-hotfix.24-violet-cicd-front"
   VIOLET_DEPLOY_PORT: $VIOLET_DEPLOY_PORT
   VIOLET_DEPLOY_ONLY: $VIOLET_DEPLOY_ONLY
   VIOLET_SERVER_IP: $VIOLET_SERVER_IP
@@ -11,10 +11,9 @@ variables:
   VIOLET_SERVER_PASSWORD: $VIOLET_SERVER_PASSWORD
   VIOLET_DEPLOY_SSH_KEY: $VIOLET_DEPLOY_SSH_KEY
   VIOLET_DOCKER_EMAIL: $VIOLET_DOCKER_EMAIL
+  VIOLET_REGISTRY: $VIOLET_REGISTRY
   VIOLET_DOCKER_PASSWORD: $VIOLET_DOCKER_PASSWORD
-before_script:
-  - export VIOLET_PROJECT_NAME=$(cat package.json | grep name | head -1 | awk -F "[ \" ]" '/name/{print$4}')
-  - export VIOLET_BUILD_TAG=${CI_COMMIT_TAG:-latest}-${PROJECT_NAME}
+  VIOLET_DOCKER_IMAGE_NAME: $VIOLET_DOCKER_IMAGE_NAME
 
 build-job:
   stage: build
@@ -55,6 +54,8 @@ deploy-job:
   stage: deploy
   image: alpine:latest
   before_script:
+    - export PROJECT_NAME=$(cat package.json | grep name | head -1 | awk -F "[\"]" '/name/{print$4}')
+    - export BUILD_TAG=${CI_COMMIT_TAG:-latest}-$PROJECT_NAME  # 设置默认值为 latest
     - apk update && apk add --no-cache openssh-client
     - mkdir -p ~/.ssh
     - echo "$VIOLET_PRIVATE_ID_RSA" > ~/.ssh/id_rsa
@@ -65,10 +66,9 @@ deploy-job:
     - echo $VIOLET_SERVER_IP
     - echo $VIOLET_SERVER_USER
     - echo $VIOLET_DEPLOY_SSH_KEY
-    - echo $TMP_IMAGE
     - echo $VIOLET_DEPLOY_PORT
     - apk add --no-cache openssh
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
-      docker pull $TMP_IMAGE && docker stop hello_world_cicd_container_test || true && docker rm hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $TMP_IMAGE"
+      docker pull $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG && docker stop hello_world_cicd_container_test || true && docker rm hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG"
   only:
     - tags
