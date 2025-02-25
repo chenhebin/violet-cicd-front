@@ -69,6 +69,6 @@ deploy-job:
     - echo $VIOLET_DEPLOY_PORT
     - apk add --no-cache openssh
     - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $VIOLET_SERVER_USER@$VIOLET_SERVER_IP "
-      docker pull $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG && docker stop hello_world_cicd_container_test || true && docker rm hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG"
+      docker pull $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG && docker stop hello_world_cicd_container_test || true && docker rm -f hello_world_cicd_container_test || true && docker run -d --name hello_world_cicd_container_test -p $VIOLET_DEPLOY_PORT:$VIOLET_DEPLOY_PORT $VIOLET_REGISTRY/$VIOLET_DOCKER_IMAGE_NAME:$BUILD_TAG"
   only:
     - tags
