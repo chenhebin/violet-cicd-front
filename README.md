@@ -2,6 +2,7 @@
 
 ## 前言
 > 持续集成/持续部署已经成了每个公司必备的业务流水线“利器”，而前端掌握这一搭建过程正变得越来越重要；
+
 > gitlab操作地址：https://gitlab.com/violet1367509330/violet-cicd-front/-/pipelines 
 
 ## 部署流程
