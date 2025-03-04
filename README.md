@@ -180,3 +180,13 @@ http {
 
 ```
 ## 至此，完成了一个简易的自动化cicd流水线
+
+## 备注：踩过的一些坑
+1. docker pull node不下来
+> 因为要搭梯子翻墙(docker/daemon.json文件和本地resolve.conf都改烂了才意识到)
+
+2. gitlab-runner注册连接不起来
+> 可以删除docker image，重新拉取，register，有时候就是会奇奇怪怪的问题，不需要弄ssl证书之类的那么麻烦（因为我也试过）
+
+3. 域名+ 端口 死活访问不了
+> 请把你的服务器访问白名单端口开放出来～
